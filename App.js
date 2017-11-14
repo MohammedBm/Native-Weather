@@ -6,12 +6,15 @@ import {
   StatusBar,
   Image,
   Dimensions,
-  TextInput
+  TextInput,
+  Button
 } from 'react-native';
 import axios from 'axios'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
 
 const API_key = '60b5122ca28b0be9'
-const default_zipcode = 4021
+const default_zipcode = '4021'
 
 export default class App extends React.Component {
   constructor(){
@@ -23,6 +26,7 @@ export default class App extends React.Component {
     }
   }
 
+  
   getForecast = () =>  {
     const request_url = "http://api.wunderground.com/api/" + API_key + '/forecast/q/' + default_zipcode + '.json'
     axios.get(request_url).then( (response) => {
@@ -58,11 +62,22 @@ export default class App extends React.Component {
     }).catch( (error) => {console.log(errr)})
   }
 
+  onSubmit = () => {
+    const { zipcode } = this.state
+    (zipcode) => this.setState({ zipcode: 1 })
+    console.log(this.state.zipcode)
+  }
+
+
   render() {  
     if (this.state.days.length <= 0 ) {
       this.getForecast(this.state.zipcode); 
     }
     return (
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.wrapper}
+        resetScrollToCoords={{ x: 0, y: 0 }}
+      >
       <View style={styles.container}>
         <StatusBar hidden />
         {
@@ -82,7 +97,16 @@ export default class App extends React.Component {
             )
           })
         }
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Address</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={this.onSubmit}
+            value={this.state.location}
+          />
+        </View>
       </View>
+      </KeyboardAwareScrollView>
     );
   }
 }
@@ -90,9 +114,10 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#3b5998',
-    alignItems: 'center',
-    justifyContent: 'center',
+      backgroundColor: '#3b5998',
+      padding: 30,
+      justifyContent: 'center',
+      alignItems: 'stretch'
   },
   dayContainer: {
     marginTop: 10,
@@ -108,5 +133,20 @@ const styles = StyleSheet.create({
   },
   day: {
     fontWeight: '900',
+  },
+  input: {
+    fontSize: 20,
+      borderRadius: 5,
+      paddingVertical: 7.5,
+      paddingHorizontal: 15,
+      backgroundColor: 'grey',
+      color: 'black'
+  },
+  inputWrapper: {
+    marginBottom: 10,
+    marginTop:5
+  },
+  button: {
+    backgroundColor: 'red',
   }
 });
